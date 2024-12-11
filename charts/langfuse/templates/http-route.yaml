@@ -1,0 +1,14 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: langfuse-http-route
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: langfuse-gateway
+  hostnames:
+    - "langfuse-v3.getliner.com"
+  rules:
+    - backendRefs:
+        - name: langfuse-web
+          port: 3000
