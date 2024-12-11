@@ -1,0 +1,20 @@
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: langfuse-gateway
+spec:
+  gatewayClassName: gke-l7-rilb
+  addresses:
+    - type: NamedAddress
+      value: langfuse-v3-static-ip
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        options:
+          networking.gke.io/cert-manager-certs: wildcard-getliner-com-us-central1

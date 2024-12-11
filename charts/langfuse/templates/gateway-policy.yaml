@@ -1,0 +1,11 @@
+kind: GCPGatewayPolicy
+apiVersion: networking.gke.io/v1
+metadata:
+  name: langfuse-gateway-policy
+spec:
+  default:
+    allowGlobalAccess: true
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: langfuse-gateway

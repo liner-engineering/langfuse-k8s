@@ -15,45 +15,96 @@ langfuse:
   next:
     healthcheckBasePath: ""
   nextauth:
-    url: http://localhost:3000
-    secret: changeme
-  salt: changeme
+    url: "https://langfuse-v3.getliner.com"
+    secret: "5gA2868f7WVtH7/+ofezHD5Dw0TzsQ+GxemMLR1nF8E="
+  salt: "WCd7pj9wa/sQeSqIHY18Q2oPoagAbFxWfJGCxZaqSHM="
   licenseKey: ""
-  telemetryEnabled: True
+  telemetryEnabled: False
   nextPublicSignUpDisabled: False
-  enableExperimentalFeatures: False
+  enableExperimentalFeatures: True
   extraContainers: []
   extraVolumes: []
   extraInitContainers: []
   extraVolumeMounts: []
 
   additionalEnv:
-    # REDIS
+    # Langfuse
+    - name: LANGFUSE_ENABLE_BACKGROUND_MIGRATIONS
+      value: "true"
+    - name: AUTH_DISABLE_SIGNUP
+      value: "false"
+    - name: AUTH_DISABLE_USERNAME_PASSWORD
+      value: "true"
+    - name: AUTH_GOOGLE_CLIENT_ID
+      value: "464880579330-jtbejcet94h7r88k2r7kbiojvhd1hfgh.apps.googleusercontent.com"
+    - name: AUTH_GOOGLE_CLIENT_SECRET
+      value: "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"
+    - name: AUTH_GOOGLE_ALLOW_ACCOUNT_LINKING
+      value: "false"
+    - name: AUTH_GOOGLE_ALLOWED_DOMAINS
+      value: "linercorp.com"
+    # Redis
     - name: "REDIS_CONNECTION_STRING"
-      value: "redis://default:changeme@langfuse-valkey-master:6379/0"
-    # CLICKHOUSE
+      value: "redis://10.132.240.91:6379/0"
+    # ClickHouse
     - name: "CLICKHOUSE_MIGRATION_URL"
       value: "clickhouse://langfuse-clickhouse:9000"
     - name: "CLICKHOUSE_URL"
       value: "http://langfuse-clickhouse:8123"
     - name: "CLICKHOUSE_USER"
-      value: "default"
+      value: "langfuse"
     - name: "CLICKHOUSE_PASSWORD"
-      value: "changeme"
-    # S3 / MinIO
+      value: "4u9dYqRnS4WEpU8KdD8j"
+    # GCS
     - name: "LANGFUSE_S3_EVENT_UPLOAD_ENABLED"
       value: "true"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_BUCKET"
-      value: "langfuse"
+      value: "liner-langfuse"
+    - name: "LANGFUSE_S3_EVENT_UPLOAD_PREFIX"
+      value: "event/"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_REGION"
       value: "auto"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID"
-      value: "minio"
+      value: "GOOG1ERME5L2ZS6V5MG527MIQBDCACPJREOXUEPJLUZWD5SZC37K3B4OJO6YM"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY"
-      value: "miniosecret"
+      value: "D5CTi5wm4wTE8tcXC4wvFfeWduHcu7WpfNJvbVIL"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT"
-      value: "http://langfuse-minio:9000"
+      value: "https://storage.googleapis.com"
     - name: "LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE"
+      value: "true"
+    # https://langfuse.com/self-hosting/infrastructure/blobstorage#multi-modal-tracing
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_ENABLED"
+      value: "true"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_BUCKET"
+      value: "liner-langfuse"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_PREFIX"
+      value: "media/"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_REGION"
+      value: "auto"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID"
+      value: "GOOG1ERME5L2ZS6V5MG527MIQBDCACPJREOXUEPJLUZWD5SZC37K3B4OJO6YM"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY"
+      value: "D5CTi5wm4wTE8tcXC4wvFfeWduHcu7WpfNJvbVIL"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT"
+      value: "https://storage.googleapis.com"
+    - name: "LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE"
+      value: "true"
+    # https://langfuse.com/self-hosting/infrastructure/blobstorage#batch-exports
+    - name: "LANGFUSE_S3_BATCH_EXPORT_ENABLED"
+      value: "false"
+    - name: "LANGFUSE_S3_BATCH_EXPORT_BUCKET"
+      value: "liner-langfuse"
+    - name: "LANGFUSE_S3_BATCH_EXPORT_PREFIX"
+      value: "export/"
+    - name: "LANGFUSE_S3_BATCH_UPLOAD_REGION"
+      value: "auto"
+    - name: "LANGFUSE_S3_BATCH_UPLOAD_ACCESS_KEY_ID"
+      value: "GOOG1ERME5L2ZS6V5MG527MIQBDCACPJREOXUEPJLUZWD5SZC37K3B4OJO6YM"
+    - name: "LANGFUSE_S3_BATCH_UPLOAD_SECRET_ACCESS_KEY"
+      value: "D5CTi5wm4wTE8tcXC4wvFfeWduHcu7WpfNJvbVIL"
+    - name: "LANGFUSE_S3_BATCH_UPLOAD_ENDPOINT"
+      value: "https://storage.googleapis.com"
+    - name: "LANGFUSE_S3_BATCH_UPLOAD_FORCE_PATH_STYLE"
       value: "true"
 
 serviceAccount:
@@ -77,50 +128,58 @@ ingress:
 resources: {}
 
 autoscaling:
-  enabled: false
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 30
 
-nodeSelector: {}
+nodeSelector:
+  cloud.google.com/gke-nodepool: lisa
 
 tolerations: []
 
 affinity: {}
 
 postgresql:
-  host: langfuse-postgresql
+  host: 10.95.85.3
   auth:
     username: postgres
-    password: postgres
-    database: postgres_langfuse
-  deploy: true
-  architecture: standalone
-  primary:
-    service:
-      ports:
-        postgresql: 5432
+    password: 5Mmy7BX9qh!g6jy4bAMw
+    database: langfuse
+  deploy: false
 
 clickhouse:
   deploy: true
   shards: 1 # Fixed. Langfuse does not support multi-shard clusters.
   replicaCount: 3
-  resourcesPreset: large
+  resources:
+    requests:
+      cpu: 1300m
+      memory: 11Gi
+    limits:
+      memory: 11Gi
   auth:
-    username: default
-    password: changeme
+    username: "langfuse"
+    password: "4u9dYqRnS4WEpU8KdD8j"
+  nodeSelector:
+    cloud.google.com/gke-nodepool: langfuse-clickhouse-n2-2-16
+  global:
+    defaultStorageClass: standard-rwo-retain
+  keeper:
+    enabled: true
+  zookeeper:
+    enabled: false
+    nodeSelector:
+      cloud.google.com/gke-nodepool: default-pool
+  persistence:
+    enabled: true
+    storageClass: standard-rwo-retain
+    accessModes: ["ReadWriteOnce"]
 
 valkey:
-  deploy: true
-  architecture: standalone
-  primary:
-    extraFlags:
-      - "--maxmemory-policy noeviction"
-  auth:
-    password: changeme
+  deploy: false
 
 minio:
-  deploy: true
-  defaultBuckets: 'langfuse'
-  auth:
-    rootUser: 'minio'
-    rootPassword: 'miniosecret'
+  deploy: false
 
 extraManifests: []
