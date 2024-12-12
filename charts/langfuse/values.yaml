@@ -28,6 +28,8 @@ langfuse:
   extraVolumeMounts: []
 
   additionalEnv:
+    - name: NODE_OPTIONS
+      value: "--max-old-space-size=2048"
     # Langfuse
     - name: LANGFUSE_ENABLE_BACKGROUND_MIGRATIONS
       value: "true"
@@ -125,12 +127,18 @@ service:
 ingress:
   enabled: false
 
-resources: {}
+# https://langfuse.com/self-hosting/infrastructure/containers
+resources:
+  requests:
+    cpu: 2000m
+    memory: 3Gi
+  limits:
+    memory: 3Gi
 
 autoscaling:
   enabled: true
-  minReplicas: 1
-  maxReplicas: 8
+  minReplicas: 2
+  maxReplicas: 20
   targetCPUUtilizationPercentage: 30
 
 nodeSelector:
@@ -154,15 +162,15 @@ clickhouse:
   replicaCount: 3
   resources:
     requests:
-      cpu: 1300m
-      memory: 11Gi
+      cpu: 3000m
+      memory: 26Gi
     limits:
-      memory: 11Gi
+      memory: 26Gi
   auth:
     username: "langfuse"
     password: "4u9dYqRnS4WEpU8KdD8j"
   nodeSelector:
-    cloud.google.com/gke-nodepool: langfuse-clickhouse-n2-2-16
+    cloud.google.com/gke-nodepool: langfuse-clickhouse-n2-4-32
   global:
     defaultStorageClass: standard-rwo-retain
   keeper:
