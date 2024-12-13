@@ -2,7 +2,7 @@
 
 - set k8s Gateway, GCPGatewayPolicy, HTTPRoute for internal access through [langfuse-v3.getliner.com](https://langfuse-v3.getliner.com/)
 - setup connection parameters for Cloud SQL postgres, Memorystore redis, GCS
-- deployed ClickHouse on k8s with ClickHouse Keeper(`keeper.enabled=true`) instead of default Zookeeper with custom storageclass `standard-rwo-retain`(pd-balanced(SSD) with `reclaimPolicy: Retain`) along with internal access through http://langfuse-clickhouse.getliner.com:80
+- deployed ClickHouse on k8s with ClickHouse Keeper(`keeper.enabled=true`) instead of default Zookeeper with custom storageclass `standard-rwo-retain`(pd-balanced(SSD) with `reclaimPolicy: Retain`) along with internal access through http://langfuse-clickhouse.getliner.com:8123
 
 ### Upgrading helm chart
 

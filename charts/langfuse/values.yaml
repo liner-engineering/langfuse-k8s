@@ -183,6 +183,14 @@ clickhouse:
     enabled: true
     storageClass: standard-rwo-retain
     accessModes: ["ReadWriteOnce"]
+    size: 1Ti
+  service:
+    type: LoadBalancer
+    annotations:
+      # https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters
+      networking.gke.io/load-balancer-type: "Internal"
+      networking.gke.io/internal-load-balancer-allow-global-access: "true"
+      networking.gke.io/load-balancer-ip-addresses: "langfuse-clickhouse-static-ip"
 
 valkey:
   deploy: false
